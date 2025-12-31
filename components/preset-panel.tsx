@@ -3,6 +3,8 @@
 import type { PixelSettings } from "@/lib/pixel-engine"
 import PresetBrowser from "./preset-browser"
 import { useState } from "react"
+import { useIsMobile } from "@/components/ui/use-mobile"
+import BottomSheet from "./bottom-sheet"
 
 interface PresetPanelProps {
   imageData: {
@@ -16,6 +18,42 @@ interface PresetPanelProps {
 
 export default function PresetPanel({ imageData, onPresetApply, currentSettings }: PresetPanelProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const isMobile = useIsMobile()
+
+  const handlePresetApply = (settings: PixelSettings) => {
+    onPresetApply(settings)
+    setIsOpen(false)
+  }
+
+  if (isMobile) {
+    return (
+      <>
+        <button
+          onClick={() => setIsOpen(true)}
+          className="fixed bottom-4 right-4 px-4 py-3 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-600 transition-colors flex items-center gap-2 text-sm font-semibold border border-blue-600 z-40 active:scale-95"
+          title="Open preset browser"
+        >
+          <span>Presets</span>
+          <span className="text-xs bg-blue-600 rounded px-2 py-0.5">New</span>
+        </button>
+
+        <BottomSheet
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          title="Presets"
+          maxHeight="90vh"
+        >
+          <div className="-mx-4 -mt-4">
+            <PresetBrowser
+              imageData={imageData}
+              onPresetApply={handlePresetApply}
+              currentSettings={currentSettings}
+            />
+          </div>
+        </BottomSheet>
+      </>
+    )
+  }
 
   return (
     <>
@@ -53,10 +91,7 @@ export default function PresetPanel({ imageData, onPresetApply, currentSettings 
             <div className="flex-1 overflow-hidden p-4">
               <PresetBrowser
                 imageData={imageData}
-                onPresetApply={(settings) => {
-                  onPresetApply(settings)
-                  setIsOpen(false)
-                }}
+                onPresetApply={handlePresetApply}
                 currentSettings={currentSettings}
               />
             </div>

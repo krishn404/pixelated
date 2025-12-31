@@ -11,6 +11,7 @@ import ExportPanel from "./export-panel"
 import PresetPanel from "./preset-panel"
 import type { PixelSettings } from "@/lib/pixel-engine"
 import { pixelateImage } from "@/lib/pixel-engine"
+import { useIsMobile } from "@/components/ui/use-mobile"
 
 interface PixelationWindowProps {
   imageData: {
@@ -37,6 +38,7 @@ export default function PixelationWindow({ imageData, onImageUpload, fileInputRe
   const [pixelatedSrc, setPixelatedSrc] = useState<string>("")
   const [isProcessing, setIsProcessing] = useState(false)
   const [activeTab, setActiveTab] = useState<"controls" | "export">("controls")
+  const isMobile = useIsMobile()
 
   useEffect(() => {
     if (!imageData) {
@@ -109,13 +111,15 @@ export default function PixelationWindow({ imageData, onImageUpload, fileInputRe
 
   return (
     <>
-      <div className="w-full max-w-7xl bg-white border border-border rounded-lg shadow-xl overflow-hidden flex flex-col h-screen max-h-screen">
+      <div className={`w-full h-full bg-white border border-border rounded-lg shadow-xl overflow-hidden flex flex-col ${
+        isMobile ? "" : ""
+      }`}>
         {/* Title Bar */}
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.3 }}
-          className="bg-gradient-to-r from-slate-50 via-slate-100 to-slate-50 border-b border-border px-5 py-3.5 flex items-center gap-3.5 flex-shrink-0"
+          className="bg-gradient-to-r from-slate-50 via-slate-100 to-slate-50 border-b border-border px-4 md:px-5 py-3 md:py-3.5 flex items-center gap-3.5 flex-shrink-0"
         >
           <motion.div
             animate={{ rotate: [0, 5, -5, 0] }}
@@ -129,13 +133,17 @@ export default function PixelationWindow({ imageData, onImageUpload, fileInputRe
         </motion.div>
 
         {/* Main Content Area */}
-        <div className="flex flex-1 overflow-hidden gap-5 p-5">
+        <div className={`flex flex-1 overflow-hidden gap-3 md:gap-5 p-3 md:p-5 min-h-0 ${
+          isMobile ? "flex-col" : "flex-row"
+        }`}>
           {/* Left Panel - Preview Section */}
           <motion.div
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.3, delay: 0.1 }}
-            className="flex-1 flex flex-col min-w-0 gap-3"
+            className={`flex flex-col min-w-0 gap-3 flex-1 min-h-0 ${
+              isMobile ? "" : ""
+            }`}
           >
             <div className="flex items-center justify-between">
               <div>
@@ -153,9 +161,30 @@ export default function PixelationWindow({ imageData, onImageUpload, fileInputRe
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3, delay: 0.2 }}
-                className="flex-1 border-2 border-dashed border-border rounded-lg p-8 bg-secondary hover:bg-muted transition-colors cursor-pointer flex flex-col items-center justify-center gap-4"
+                className="flex-1 border-2 border-dashed border-border rounded-lg p-6 md:p-8 bg-secondary hover:bg-muted transition-colors cursor-pointer flex flex-col items-center justify-center gap-4 min-h-0"
                 onClick={() => fileInputRef.current?.click()}
-                whileHover={{ scale: 1.02 }}
+                onDragOver={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                }}
+                onDrop={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  const file = e.dataTransfer.files?.[0]
+                  if (file && file.type.startsWith("image/")) {
+                    // Create a proper FileList-like object
+                    const dataTransfer = new DataTransfer()
+                    dataTransfer.items.add(file)
+                    const fakeInput = document.createElement("input")
+                    fakeInput.type = "file"
+                    fakeInput.files = dataTransfer.files
+                    const fakeEvent = {
+                      target: fakeInput,
+                    } as React.ChangeEvent<HTMLInputElement>
+                    onImageUpload(fakeEvent)
+                  }
+                }}
+                whileHover={{ scale: isMobile ? 1 : 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
                 <UploadIcon className="w-8 h-8 text-muted-foreground" />
@@ -168,7 +197,7 @@ export default function PixelationWindow({ imageData, onImageUpload, fileInputRe
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3, delay: 0.2 }}
-                className="flex-1 border border-border rounded-lg bg-gradient-to-br from-slate-50 to-white overflow-hidden shadow-inner"
+                className="flex-1 border border-border rounded-lg bg-gradient-to-br from-slate-50 to-white overflow-hidden shadow-inner min-h-0"
               >
                 <InteractivePreview
                   imageData={imageData}
@@ -180,70 +209,86 @@ export default function PixelationWindow({ imageData, onImageUpload, fileInputRe
             )}
           </motion.div>
 
-          {/* Right Panel - Controls & Export */}
-          <motion.div
-            initial={{ x: 20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.3, delay: 0.1 }}
-            className="w-96 flex flex-col gap-3 min-w-0"
-          >
-            {/* Tab Navigation */}
-            <div className="flex gap-2 bg-secondary p-1.5 rounded-lg border border-border">
-              <motion.button
-                onClick={() => setActiveTab("controls")}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className={`flex-1 px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all uppercase tracking-wider flex items-center justify-center gap-2 ${
-                  activeTab === "controls"
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <SettingsIcon className="w-3.5 h-3.5" />
-                Settings
-              </motion.button>
-              <motion.button
-                onClick={() => setActiveTab("export")}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className={`flex-1 px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all uppercase tracking-wider flex items-center justify-center gap-2 ${
-                  activeTab === "export"
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <DownloadIcon className="w-3.5 h-3.5" />
-                Export
-              </motion.button>
-            </div>
-
-            {/* Tab Content */}
+          {/* Right Panel - Controls & Export - Hidden on mobile, shown via bottom sheets */}
+          {!isMobile && (
             <motion.div
-              key={activeTab}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2 }}
-              className="flex-1 overflow-y-auto bg-white border border-border rounded-lg p-4 space-y-3"
+              initial={{ x: 20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+              className="w-96 flex flex-col gap-3 min-w-0"
             >
-              {activeTab === "controls" ? (
-                <PixelControlsAdvanced
-                  settings={settings}
-                  onSettingsChange={setSettings}
-                  hasImage={!!imageData}
-                  isProcessing={isProcessing}
-                  onDownload={handleDownload}
-                  onCopyClipboard={handleCopyClipboard}
-                />
-              ) : (
-                <ExportPanel
-                  imageData={imageData}
-                  settings={settings}
-                  hasImage={!!imageData}
-                  isProcessing={isProcessing}
-                />
-              )}
+              {/* Tab Navigation */}
+              <div className="flex gap-2 bg-secondary p-1.5 rounded-lg border border-border">
+                <motion.button
+                  onClick={() => setActiveTab("controls")}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`flex-1 px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all uppercase tracking-wider flex items-center justify-center gap-2 ${
+                    activeTab === "controls"
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <SettingsIcon className="w-3.5 h-3.5" />
+                  Settings
+                </motion.button>
+                <motion.button
+                  onClick={() => setActiveTab("export")}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`flex-1 px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all uppercase tracking-wider flex items-center justify-center gap-2 ${
+                    activeTab === "export"
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <DownloadIcon className="w-3.5 h-3.5" />
+                  Export
+                </motion.button>
+              </div>
+
+              {/* Tab Content */}
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
+                className="flex-1 overflow-y-auto bg-white border border-border rounded-lg p-4 space-y-3"
+              >
+                {activeTab === "controls" ? (
+                  <PixelControlsAdvanced
+                    settings={settings}
+                    onSettingsChange={setSettings}
+                    hasImage={!!imageData}
+                    isProcessing={isProcessing}
+                    onDownload={handleDownload}
+                    onCopyClipboard={handleCopyClipboard}
+                  />
+                ) : (
+                  <ExportPanel
+                    imageData={imageData}
+                    settings={settings}
+                    hasImage={!!imageData}
+                    isProcessing={isProcessing}
+                  />
+                )}
+              </motion.div>
             </motion.div>
-          </motion.div>
+          )}
+
+          {/* Mobile Controls - Bottom Sheet Triggers */}
+          {isMobile && (
+            <div className="flex-shrink-0 space-y-2">
+              <PixelControlsAdvanced
+                settings={settings}
+                onSettingsChange={setSettings}
+                hasImage={!!imageData}
+                isProcessing={isProcessing}
+                onDownload={handleDownload}
+                onCopyClipboard={handleCopyClipboard}
+              />
+            </div>
+          )}
         </div>
       </div>
 

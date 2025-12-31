@@ -78,22 +78,27 @@ export default function InteractivePreview({ imageData, pixelatedSrc, isProcessi
     setZoom((z) => Math.max(10, Math.min(400, z + delta)))
   }
 
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handlePointerDown = (e: React.PointerEvent) => {
     if (zoom === 100 && panX === 0 && panY === 0) return
+    if ((e.target as HTMLElement).closest('button, input, a')) return
 
     setIsDragging(true)
     setDragStart({ x: e.clientX - panX, y: e.clientY - panY })
+    ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
   }
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handlePointerMove = (e: React.PointerEvent) => {
     if (!isDragging) return
 
     setPanX(e.clientX - dragStart.x)
     setPanY(e.clientY - dragStart.y)
   }
 
-  const handleMouseUp = () => {
+  const handlePointerUp = (e: React.PointerEvent) => {
     setIsDragging(false)
+    try {
+      ;(e.target as HTMLElement).releasePointerCapture(e.pointerId)
+    } catch {}
   }
 
   const resetView = () => {
@@ -135,11 +140,12 @@ export default function InteractivePreview({ imageData, pixelatedSrc, isProcessi
     <div className="flex-1 flex flex-col gap-2 min-h-0">
       <div
         ref={containerRef}
-        className="flex-1 border border-neutral-200 rounded-sm bg-neutral-50 overflow-hidden cursor-move relative"
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
+        className="flex-1 border border-neutral-200 rounded-sm bg-neutral-50 overflow-hidden cursor-move relative touch-none"
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+        style={{ touchAction: 'none' }}
       >
         <div
           className="w-full h-full flex items-center justify-center select-none"
@@ -147,6 +153,7 @@ export default function InteractivePreview({ imageData, pixelatedSrc, isProcessi
             transform: `translate(${panX}px, ${panY}px) scale(${zoom / 100})`,
             transformOrigin: "center",
             transition: isDragging ? "none" : "transform 0.1s ease-out",
+            willChange: isDragging ? "transform" : "auto",
           }}
         >
           <img
@@ -155,6 +162,7 @@ export default function InteractivePreview({ imageData, pixelatedSrc, isProcessi
             alt="Pixelated preview"
             className="max-w-none max-h-none"
             draggable={false}
+            style={{ imageRendering: "pixelated" }}
           />
         </div>
 
