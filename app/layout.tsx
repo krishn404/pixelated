@@ -4,32 +4,50 @@ import type { Metadata } from "next"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 
-import { Fjalla_One as Font_Fjalla_One, Inconsolata as Font_Inconsolata } from 'next/font/google'
+import { Fjalla_One, Inconsolata } from "next/font/google"
 
-// Initialize fonts
-const _fjallaOne = Font_Fjalla_One({ subsets: ['latin'], weight: ["400"] })
-const _inconsolata = Font_Inconsolata({ subsets: ['latin'], weight: ["200","300","400","500","600","700","800","900"] })
+const fjallaOne = Fjalla_One({
+  subsets: ["latin"],
+  weight: ["400"],
+})
+
+const inconsolata = Inconsolata({
+  subsets: ["latin"],
+  weight: ["200", "300", "400", "500", "600", "700", "800", "900"],
+})
 
 export const metadata: Metadata = {
-  title: "Pixelator – Image Pixelation Utility",
+  title: "Pix – turn images into pixalated image",
   description: "Simple, fast image pixelation tool with live preview and download",
-  generator: "pixalated.app",
+  generator: "pix.krixnx.xyz",
+
   icons: {
-    icon: [
+    icon: "/PIX.png",
+    apple: "/PIX.png",
+  },
+
+  openGraph: {
+    title: "Pix – turn images into pixalated image",
+    description: "Simple, fast image pixelation tool with live preview and download",
+    url: "https://pix.krixnx.xyz",
+    siteName: "Pixelator",
+    images: [
       {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
-        type: "image/svg+xml",
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Pixelator – Image Pixelation Utility",
       },
     ],
-    apple: "/apple-icon.png",
+    locale: "en_US",
+    type: "website",
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "Pix – turn images into pixalated image",
+    description: "Simple, fast image pixelation tool with live preview and download",
+    images: ["/og-image.jpg"],
   },
 }
 
@@ -40,7 +58,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`font-mono antialiased`}>
+      <body className={`font-mono antialiased ${fjallaOne.className} ${inconsolata.className}`}>
         {children}
         <Analytics />
       </body>
