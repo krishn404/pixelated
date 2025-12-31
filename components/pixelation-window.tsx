@@ -120,7 +120,7 @@ export default function PixelationWindow({ imageData, onImageUpload, fileInputRe
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.3 }}
-          className="bg-gradient-to-r from-slate-50 via-slate-100 to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 border-b border-border px-4 md:px-5 py-3 md:py-3.5 flex items-center justify-between gap-3.5 flex-shrink-0"
+          className="bg-gradient-to-r from-slate-50 via-slate-100 to-slate-50 dark:from-black dark:via-black dark:to-black border-b border-border px-4 md:px-5 py-3 md:py-3.5 flex items-center justify-between gap-3.5 flex-shrink-0"
         >
           <div className="flex items-center gap-3.5">
             <motion.div
