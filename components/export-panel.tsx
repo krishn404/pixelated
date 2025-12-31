@@ -131,9 +131,9 @@ export default function ExportPanel({ imageData, settings, hasImage, isProcessin
 
   return (
     <div className="space-y-4">
-      <div className="bg-blue-50 border border-blue-200 rounded-md p-3.5 space-y-2">
-        <div className="text-xs font-semibold text-blue-900">Resolution Guide</div>
-        <div className="text-xs text-blue-800 space-y-1.5">
+      <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-md p-3.5 space-y-2">
+        <div className="text-xs font-semibold text-blue-900 dark:text-blue-100">Resolution Guide</div>
+        <div className="text-xs text-blue-800 dark:text-blue-200 space-y-1.5">
           <div>
             <span className="font-medium">1× (Standard)</span> - Default resolution for regular displays
           </div>
@@ -168,8 +168,8 @@ export default function ExportPanel({ imageData, settings, hasImage, isProcessin
                   disabled={!hasImage || isProcessing || !!exportProgress}
                   className={`w-full px-3 py-2.5 text-xs font-medium rounded-md border transition-colors ${
                     hasImage && !isProcessing && !exportProgress
-                      ? `bg-blue-500 border-blue-600 text-white hover:bg-blue-600 active:bg-blue-700`
-                      : "bg-neutral-200 border-neutral-300 text-neutral-500 cursor-not-allowed"
+                      ? `bg-blue-500 dark:bg-blue-600 border-blue-600 dark:border-blue-500 text-white hover:bg-blue-600 dark:hover:bg-blue-500 active:bg-blue-700 dark:active:bg-blue-400`
+                      : "bg-muted border-border text-muted-foreground cursor-not-allowed"
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -187,7 +187,7 @@ export default function ExportPanel({ imageData, settings, hasImage, isProcessin
       </div>
 
       {/* Divider */}
-      <div className="border-t border-neutral-200" />
+      <div className="border-t border-border" />
 
       {/* Clipboard Copy */}
       <div className="space-y-2">
@@ -197,17 +197,17 @@ export default function ExportPanel({ imageData, settings, hasImage, isProcessin
           disabled={!hasImage || isProcessing || !!exportProgress}
           className={`w-full px-3 py-2.5 text-xs font-medium rounded-md border transition-colors ${
             hasImage && !isProcessing && !exportProgress
-              ? "bg-emerald-500 border-emerald-600 text-white hover:bg-emerald-600 active:bg-emerald-700"
-              : "bg-neutral-200 border-neutral-300 text-neutral-500 cursor-not-allowed"
+              ? "bg-emerald-500 dark:bg-emerald-600 border-emerald-600 dark:border-emerald-500 text-white hover:bg-emerald-600 dark:hover:bg-emerald-500 active:bg-emerald-700 dark:active:bg-emerald-400"
+              : "bg-muted border-border text-muted-foreground cursor-not-allowed"
           }`}
         >
           {exportProgress?.includes("Copying") ? "Copying..." : "Copy to Clipboard"}
         </button>
-        <p className="text-xs text-neutral-500">Paste directly into design tools (standard 1× resolution)</p>
+        <p className="text-xs text-muted-foreground">Paste directly into design tools (standard 1× resolution)</p>
       </div>
 
       {/* Divider */}
-      <div className="border-t border-neutral-200" />
+      <div className="border-t border-border" />
 
       {/* Batch Export */}
       <div className="space-y-2">
@@ -217,13 +217,13 @@ export default function ExportPanel({ imageData, settings, hasImage, isProcessin
           disabled={!hasImage || isProcessing || !!exportProgress}
           className={`w-full px-3 py-2.5 text-xs font-medium rounded-md border transition-colors ${
             hasImage && !isProcessing && !exportProgress
-              ? "bg-purple-500 border-purple-600 text-white hover:bg-purple-600 active:bg-purple-700"
-              : "bg-neutral-200 border-neutral-300 text-neutral-500 cursor-not-allowed"
+              ? "bg-purple-500 dark:bg-purple-600 border-purple-600 dark:border-purple-500 text-white hover:bg-purple-600 dark:hover:bg-purple-500 active:bg-purple-700 dark:active:bg-purple-400"
+              : "bg-muted border-border text-muted-foreground cursor-not-allowed"
           }`}
         >
           {exportProgress?.includes("Batch") ? "Exporting..." : "Export All Scales (1×, 2×, 4×)"}
         </button>
-        <p className="text-xs text-neutral-500">Download all three resolutions at once for maximum flexibility</p>
+        <p className="text-xs text-muted-foreground">Download all three resolutions at once for maximum flexibility</p>
       </div>
 
       {/* Progress Indicator */}
@@ -231,10 +231,10 @@ export default function ExportPanel({ imageData, settings, hasImage, isProcessin
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="bg-blue-50 border border-blue-200 rounded-md p-3 flex items-center gap-2"
+          className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-md p-3 flex items-center gap-2"
         >
-          <div className="w-4 h-4 border-2 border-blue-300 border-t-blue-500 rounded-full animate-spin" />
-          <span className="text-xs text-blue-700">{exportProgress}</span>
+          <div className="w-4 h-4 border-2 border-blue-300 dark:border-blue-700 border-t-blue-500 dark:border-t-blue-400 rounded-full animate-spin" />
+          <span className="text-xs text-blue-700 dark:text-blue-300">{exportProgress}</span>
         </motion.div>
       )}
 
@@ -243,13 +243,13 @@ export default function ExportPanel({ imageData, settings, hasImage, isProcessin
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-neutral-50 border border-neutral-200 rounded-md p-3 space-y-2"
+          className="bg-secondary border border-border rounded-md p-3 space-y-2"
         >
           <label className="text-xs font-semibold text-foreground">Recent Exports</label>
           <div className="space-y-1">
             {exportedFiles.map((file) => (
               <div key={file.scale} className="flex items-center justify-between text-xs">
-                <span className="text-neutral-600">{file.scale}× scale</span>
+                <span className="text-muted-foreground">{file.scale}× scale</span>
                 <button
                   onClick={() => {
                     const link = document.createElement("a")
@@ -258,7 +258,7 @@ export default function ExportPanel({ imageData, settings, hasImage, isProcessin
                     link.click()
                     addToast(`Re-downloaded ${file.scale}× version`, "success")
                   }}
-                  className="text-blue-600 hover:text-blue-700 font-medium"
+                  className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
                 >
                   Download again
                 </button>

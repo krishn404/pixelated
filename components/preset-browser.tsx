@@ -132,7 +132,7 @@ export default function PresetBrowser({ imageData, onPresetApply, currentSetting
   const displayedPresets = activeTab === "built-in" ? presets : customPresets
 
   if (!imageData) {
-    return <div className="text-xs text-neutral-500 p-4 text-center">Upload an image to preview presets</div>
+    return <div className="text-xs text-muted-foreground p-4 text-center">Upload an image to preview presets</div>
   }
 
   return (
@@ -143,8 +143,8 @@ export default function PresetBrowser({ imageData, onPresetApply, currentSetting
           onClick={() => setActiveTab("built-in")}
           className={`flex-1 px-3 py-2 text-xs font-medium rounded-sm border transition-colors ${
             activeTab === "built-in"
-              ? "bg-blue-500 border-blue-600 text-white"
-              : "bg-white border-neutral-300 text-neutral-700 hover:bg-neutral-50"
+              ? "bg-blue-500 dark:bg-blue-600 border-blue-600 dark:border-blue-500 text-white"
+              : "bg-card border-border text-foreground hover:bg-secondary"
           }`}
         >
           Built-in
@@ -153,8 +153,8 @@ export default function PresetBrowser({ imageData, onPresetApply, currentSetting
           onClick={() => setActiveTab("custom")}
           className={`flex-1 px-3 py-2 text-xs font-medium rounded-sm border transition-colors ${
             activeTab === "custom"
-              ? "bg-green-500 border-green-600 text-white"
-              : "bg-white border-neutral-300 text-neutral-700 hover:bg-neutral-50"
+              ? "bg-green-500 dark:bg-green-600 border-green-600 dark:border-green-500 text-white"
+              : "bg-card border-border text-foreground hover:bg-secondary"
           }`}
         >
           Saved ({customPresets.length})
@@ -165,7 +165,7 @@ export default function PresetBrowser({ imageData, onPresetApply, currentSetting
       <button
         onClick={saveCurrentAsPreset}
         disabled={isGenerating}
-        className="w-full px-3 py-2 text-xs font-medium bg-purple-500 text-white rounded-sm border border-purple-600 hover:bg-purple-600 transition-colors disabled:opacity-50"
+        className="w-full px-3 py-2 text-xs font-medium bg-purple-500 dark:bg-purple-600 text-white rounded-sm border border-purple-600 dark:border-purple-500 hover:bg-purple-600 dark:hover:bg-purple-500 transition-colors disabled:opacity-50"
       >
         {isGenerating ? "Saving..." : "Save Current Settings"}
       </button>
@@ -173,14 +173,14 @@ export default function PresetBrowser({ imageData, onPresetApply, currentSetting
       {/* Preset Grid */}
       <div className="flex-1 overflow-y-auto grid grid-cols-2 gap-2">
         {displayedPresets.length === 0 ? (
-          <div className="col-span-2 text-xs text-neutral-500 text-center py-8">
+          <div className="col-span-2 text-xs text-muted-foreground text-center py-8">
             {activeTab === "custom" ? "No saved presets yet" : "Loading presets..."}
           </div>
         ) : (
           displayedPresets.map((preset) => (
             <div
               key={preset.name}
-              className="relative group cursor-pointer rounded-sm overflow-hidden border-2 border-neutral-200 hover:border-blue-400 transition-colors"
+              className="relative group cursor-pointer rounded-sm overflow-hidden border-2 border-border hover:border-blue-400 dark:hover:border-blue-500 transition-colors"
               onClick={() =>
                 onPresetApply({
                   pixelSize: preset.pixelSize,
@@ -203,8 +203,8 @@ export default function PresetBrowser({ imageData, onPresetApply, currentSetting
                   className="w-full h-24 object-cover group-hover:brightness-110 transition-all"
                 />
               ) : (
-                <div className="w-full h-24 bg-neutral-200 flex items-center justify-center">
-                  <div className="text-xs text-neutral-500">Loading...</div>
+                <div className="w-full h-24 bg-muted flex items-center justify-center">
+                  <div className="text-xs text-muted-foreground">Loading...</div>
                 </div>
               )}
 
@@ -232,7 +232,7 @@ export default function PresetBrowser({ imageData, onPresetApply, currentSetting
       </div>
 
       {/* Info */}
-      <div className="text-xs text-neutral-500 bg-neutral-100 px-2 py-1.5 rounded-sm">
+      <div className="text-xs text-muted-foreground bg-secondary px-2 py-1.5 rounded-sm">
         Click a preset to apply, or save your current settings as a custom preset
       </div>
     </div>

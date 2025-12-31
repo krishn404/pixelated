@@ -107,7 +107,7 @@ export default function PixelControlsAdvanced({
             className={`text-xs px-2.5 py-1.5 rounded-md border transition-all ${
               settings.pixelSize === point
                 ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                : "bg-white border-border hover:border-primary/30 text-foreground hover:bg-secondary"
+                : "bg-card border-border hover:border-primary/30 text-foreground hover:bg-secondary"
             } disabled:opacity-50`}
           >
             {point}
@@ -123,7 +123,7 @@ export default function PixelControlsAdvanced({
           value={localPixelSize}
           onChange={(e) => handlePixelSizeChange(Number.parseInt(e.target.value) || 1)}
           disabled={!hasImage}
-          className="w-full px-3 py-2 text-xs border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary disabled:opacity-50 bg-white"
+          className="w-full px-3 py-2 text-xs border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary disabled:opacity-50 bg-card"
         />
       </div>
     </div>
@@ -273,7 +273,7 @@ export default function PixelControlsAdvanced({
                     e.stopPropagation()
                     applyPreset(preset.settings)
                   }}
-                  className="flex-1 text-left px-3 py-2 text-xs bg-emerald-50 hover:bg-emerald-100 rounded-md transition-colors border border-emerald-200 text-emerald-900"
+                  className="flex-1 text-left px-3 py-2 text-xs bg-emerald-50 dark:bg-emerald-950 hover:bg-emerald-100 dark:hover:bg-emerald-900 rounded-md transition-colors border border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-100"
                 >
                   <div className="font-medium">{preset.name}</div>
                 </button>
@@ -286,7 +286,7 @@ export default function PixelControlsAdvanced({
                       JSON.stringify(customPresets.filter((_, i) => i !== idx)),
                     )
                   }}
-                  className="px-2 py-2 text-xs bg-red-50 text-red-600 hover:bg-red-100 rounded-md border border-red-200 transition-colors"
+                  className="px-2 py-2 text-xs bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900 rounded-md border border-red-200 dark:border-red-800 transition-colors"
                   title="Delete preset"
                 >
                   ✕
@@ -312,28 +312,28 @@ export default function PixelControlsAdvanced({
           </button>
           <button
             onClick={() => openMobileSheet("pixel-size")}
-            className="px-3 py-2.5 text-xs font-semibold bg-white text-foreground rounded-lg border border-border hover:bg-secondary transition-all active:scale-95 flex items-center justify-between"
+            className="px-3 py-2.5 text-xs font-semibold bg-card text-foreground rounded-lg border border-border hover:bg-secondary transition-all active:scale-95 flex items-center justify-between"
           >
             <span>Pixel Size</span>
             <span className="text-primary">{localPixelSize}px</span>
           </button>
           <button
             onClick={() => openMobileSheet("sampling")}
-            className="px-3 py-2.5 text-xs font-semibold bg-white text-foreground rounded-lg border border-border hover:bg-secondary transition-all active:scale-95 flex items-center justify-between"
+            className="px-3 py-2.5 text-xs font-semibold bg-card text-foreground rounded-lg border border-border hover:bg-secondary transition-all active:scale-95 flex items-center justify-between"
           >
             <span>Sampling</span>
             <span className="text-muted-foreground capitalize text-xs">{settings.sampling}</span>
           </button>
           <button
             onClick={() => openMobileSheet("colors")}
-            className="px-3 py-2.5 text-xs font-semibold bg-white text-foreground rounded-lg border border-border hover:bg-secondary transition-all active:scale-95 flex items-center justify-between"
+            className="px-3 py-2.5 text-xs font-semibold bg-card text-foreground rounded-lg border border-border hover:bg-secondary transition-all active:scale-95 flex items-center justify-between"
           >
             <span>Color Effects</span>
             <span className="text-muted-foreground capitalize text-xs">{settings.colorEffect}</span>
           </button>
         </div>
 
-        <label className="flex items-center gap-3 p-3 border border-border rounded-lg bg-white hover:bg-secondary transition-colors cursor-pointer">
+        <label className="flex items-center gap-3 p-3 border border-border rounded-lg bg-card hover:bg-secondary transition-colors cursor-pointer">
           <input
             type="checkbox"
             checked={settings.showGrid}
@@ -443,7 +443,7 @@ export default function PixelControlsAdvanced({
               disabled={!hasImage || isProcessing}
               className={`w-full px-4 py-2 text-xs font-semibold rounded-lg border transition-all ${
                 hasImage && !isProcessing
-                  ? "bg-emerald-500 text-white border-emerald-600 hover:bg-emerald-600 active:scale-95"
+                  ? "bg-emerald-500 dark:bg-emerald-600 text-white border-emerald-600 dark:border-emerald-500 hover:bg-emerald-600 dark:hover:bg-emerald-500 active:scale-95"
                   : "bg-muted text-muted-foreground border-border cursor-not-allowed"
               }`}
             >
@@ -468,14 +468,14 @@ export default function PixelControlsAdvanced({
         </button>
 
         {showPresets && (
-          <div className="absolute top-11 left-0 right-0 bg-white border border-border rounded-lg shadow-lg z-10 p-3 space-y-2 max-h-64 overflow-y-auto">
+          <div className="absolute top-11 left-0 right-0 bg-card border border-border rounded-lg shadow-lg z-10 p-3 space-y-2 max-h-64 overflow-y-auto">
             {renderPresetsContent()}
           </div>
         )}
       </div>
 
       {/* Pixel Size Section */}
-      <div className="border border-border rounded-lg bg-white overflow-hidden hover:border-primary/20 transition-colors">
+      <div className="border border-border rounded-lg bg-card overflow-hidden hover:border-primary/20 transition-colors">
         <div
           className="p-4 flex items-center justify-between cursor-pointer hover:bg-secondary transition-colors"
           onClick={() => setExpandedSection(expandedSection === "pixel-size" ? null : "pixel-size")}
@@ -496,7 +496,7 @@ export default function PixelControlsAdvanced({
       </div>
 
       {/* Sampling Mode */}
-      <div className="border border-border rounded-lg bg-white overflow-hidden hover:border-primary/20 transition-colors">
+      <div className="border border-border rounded-lg bg-card overflow-hidden hover:border-primary/20 transition-colors">
         <div
           className="p-4 flex items-center justify-between cursor-pointer hover:bg-secondary transition-colors"
           onClick={() => setExpandedSection(expandedSection === "sampling" ? null : "sampling")}
@@ -517,7 +517,7 @@ export default function PixelControlsAdvanced({
       </div>
 
       {/* Color Effects */}
-      <div className="border border-border rounded-lg bg-white overflow-hidden hover:border-primary/20 transition-colors">
+      <div className="border border-border rounded-lg bg-card overflow-hidden hover:border-primary/20 transition-colors">
         <div
           className="p-4 flex items-center justify-between cursor-pointer hover:bg-secondary transition-colors"
           onClick={() => setExpandedSection(expandedSection === "colors" ? null : "colors")}
@@ -538,7 +538,7 @@ export default function PixelControlsAdvanced({
       </div>
 
       {/* Grid Overlay */}
-      <label className="flex items-center gap-3 p-4 border border-border rounded-lg bg-white hover:bg-secondary transition-colors cursor-pointer group">
+      <label className="flex items-center gap-3 p-4 border border-border rounded-lg bg-card hover:bg-secondary transition-colors cursor-pointer group">
         <input
           type="checkbox"
           checked={settings.showGrid}
@@ -553,7 +553,7 @@ export default function PixelControlsAdvanced({
       </label>
 
       {/* Export Options */}
-      <div className="border border-border rounded-lg bg-white overflow-hidden">
+      <div className="border border-border rounded-lg bg-card overflow-hidden">
         <div className="p-4 border-b border-border bg-secondary/30">
           <label className="text-xs font-semibold text-foreground">Export Options</label>
         </div>
@@ -617,7 +617,7 @@ export default function PixelControlsAdvanced({
             const name = prompt("Preset name:")
             if (name) savePreset(name)
           }}
-          className="w-full px-4 py-2.5 text-xs font-semibold bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg border border-purple-700 hover:shadow-md transition-all active:scale-95"
+          className="w-full px-4 py-2.5 text-xs font-semibold bg-gradient-to-r from-purple-500 to-purple-600 dark:from-purple-600 dark:to-purple-700 text-white rounded-lg border border-purple-700 dark:border-purple-600 hover:shadow-md transition-all active:scale-95"
         >
           ⭐ Save as Preset
         </button>

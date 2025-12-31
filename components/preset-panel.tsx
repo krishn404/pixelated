@@ -30,11 +30,11 @@ export default function PresetPanel({ imageData, onPresetApply, currentSettings 
       <>
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-4 right-4 px-4 py-3 bg-blue-500 text-white rounded-lg shadow-lg hover:bg-blue-600 transition-colors flex items-center gap-2 text-sm font-semibold border border-blue-600 z-40 active:scale-95"
+          className="fixed bottom-4 right-4 px-4 py-3 bg-blue-500 dark:bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-600 dark:hover:bg-blue-500 transition-colors flex items-center gap-2 text-sm font-semibold border border-blue-600 dark:border-blue-500 z-40 active:scale-95"
           title="Open preset browser"
         >
           <span>Presets</span>
-          <span className="text-xs bg-blue-600 rounded px-2 py-0.5">New</span>
+          <span className="text-xs bg-blue-600 dark:bg-blue-700 rounded px-2 py-0.5">New</span>
         </button>
 
         <BottomSheet
@@ -59,11 +59,11 @@ export default function PresetPanel({ imageData, onPresetApply, currentSettings 
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 px-4 py-3 bg-blue-500 text-white rounded-md shadow-lg hover:bg-blue-600 transition-colors flex items-center gap-2 text-sm font-semibold border border-blue-600 z-40"
+        className="fixed bottom-6 right-6 px-4 py-3 bg-blue-500 dark:bg-blue-600 text-white rounded-md shadow-lg hover:bg-blue-600 dark:hover:bg-blue-500 transition-colors flex items-center gap-2 text-sm font-semibold border border-blue-600 dark:border-blue-500 z-40"
         title="Open preset browser"
       >
         <span>Presets</span>
-        <span className="text-xs bg-blue-600 rounded px-2 py-0.5">New</span>
+        <span className="text-xs bg-blue-600 dark:bg-blue-700 rounded px-2 py-0.5">New</span>
       </button>
 
       {isOpen && (
