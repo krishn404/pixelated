@@ -8,7 +8,6 @@ import { useState, useEffect } from "react"
 import InteractivePreview from "./interactive-preview"
 import PixelControlsAdvanced from "./pixel-controls-advanced"
 import ExportPanel from "./export-panel"
-import PresetPanel from "./preset-panel"
 import type { PixelSettings } from "@/lib/pixel-engine"
 import { pixelateImage } from "@/lib/pixel-engine"
 import { useIsMobile } from "@/components/ui/use-mobile"
@@ -39,6 +38,7 @@ export default function PixelationWindow({ imageData, onImageUpload, fileInputRe
   const [pixelatedSrc, setPixelatedSrc] = useState<string>("")
   const [isProcessing, setIsProcessing] = useState(false)
   const [activeTab, setActiveTab] = useState<"controls" | "export">("controls")
+  const [mobileZoom, setMobileZoom] = useState(100) // Track zoom from canvas for mobile zoom buttons
   const isMobile = useIsMobile()
 
   useEffect(() => {
@@ -112,9 +112,11 @@ export default function PixelationWindow({ imageData, onImageUpload, fileInputRe
 
   return (
     <>
-      <div className={`w-full h-full bg-card border border-border rounded-lg shadow-xl overflow-hidden flex flex-col ${
-        isMobile ? "" : ""
-      }`}>
+      <div
+        className={`w-full h-full bg-card border border-border rounded-lg shadow-xl overflow-hidden flex flex-col ${
+          isMobile ? "" : ""
+        }`}
+      >
         {/* Title Bar */}
         <motion.div
           initial={{ y: -20, opacity: 0 }}
@@ -137,17 +139,17 @@ export default function PixelationWindow({ imageData, onImageUpload, fileInputRe
         </motion.div>
 
         {/* Main Content Area */}
-        <div className={`flex flex-1 overflow-hidden gap-3 md:gap-5 p-3 md:p-5 min-h-0 ${
-          isMobile ? "flex-col" : "flex-row"
-        }`}>
+        <div
+          className={`flex flex-1 overflow-hidden gap-3 md:gap-5 p-3 md:p-5 min-h-0 ${
+            isMobile ? "flex-col pb-[180px]" : "flex-row"
+          }`}
+        >
           {/* Left Panel - Preview Section */}
           <motion.div
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.3, delay: 0.1 }}
-            className={`flex flex-col min-w-0 gap-3 flex-1 min-h-0 ${
-              isMobile ? "" : ""
-            }`}
+            className={`flex flex-col min-w-0 gap-3 flex-1 min-h-0 ${isMobile ? "" : ""}`}
           >
             <div className="flex items-center justify-between">
               <div>
@@ -208,6 +210,7 @@ export default function PixelationWindow({ imageData, onImageUpload, fileInputRe
                   pixelatedSrc={pixelatedSrc}
                   isProcessing={isProcessing}
                   useComparisonSlider={false}
+                  onZoomChange={setMobileZoom}
                 />
               </motion.div>
             )}
@@ -280,23 +283,25 @@ export default function PixelationWindow({ imageData, onImageUpload, fileInputRe
             </motion.div>
           )}
 
-          {/* Mobile Controls - Bottom Sheet Triggers */}
+          {/* Mobile Controls - Fixed Bottom Bar */}
           {isMobile && (
-            <div className="flex-shrink-0 space-y-2">
-              <PixelControlsAdvanced
-                settings={settings}
-                onSettingsChange={setSettings}
-                hasImage={!!imageData}
-                isProcessing={isProcessing}
-                onDownload={handleDownload}
-                onCopyClipboard={handleCopyClipboard}
-              />
+            <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border overflow-y-auto max-h-44 shadow-xl">
+              <div className="p-3 space-y-2 pb-[max(1rem,env(safe-area-inset-bottom))]">
+                <PixelControlsAdvanced
+                  settings={settings}
+                  onSettingsChange={setSettings}
+                  hasImage={!!imageData}
+                  isProcessing={isProcessing}
+                  onDownload={handleDownload}
+                  onCopyClipboard={handleCopyClipboard}
+                  mobileZoom={mobileZoom}
+                  onMobileZoomChange={setMobileZoom}
+                />
+              </div>
             </div>
           )}
         </div>
       </div>
-
-      {imageData && <PresetPanel imageData={imageData} onPresetApply={setSettings} currentSettings={settings} />}
 
       {/* Hidden File Input */}
       <input ref={fileInputRef} type="file" accept="image/*" onChange={onImageUpload} className="hidden" />

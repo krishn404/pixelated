@@ -4,18 +4,18 @@ import { type SamplingMode, type ColorEffect, type PixelSettings, COMMON_PRESETS
 import { useState, useRef, useCallback, useEffect } from "react"
 import { useIsMobile } from "@/components/ui/use-mobile"
 import BottomSheet from "./bottom-sheet"
-import { SettingsIcon, DownloadIcon } from "lucide-react"
+import { DownloadIcon } from "lucide-react"
 
-interface AdvancedControlsProps {
+interface PixelControlsAdvancedProps {
   settings: PixelSettings
   onSettingsChange: (settings: PixelSettings) => void
   hasImage: boolean
   isProcessing: boolean
   onDownload: (scale: number) => void
   onCopyClipboard: () => void
+  mobileZoom?: number // Add mobile zoom prop for canvas zoom
+  onMobileZoomChange?: (zoom: number) => void // Add mobile zoom callback
 }
-
-const PIXEL_SNAP_POINTS = [2, 4, 6, 8, 10, 12, 16, 20, 24, 32]
 
 export default function PixelControlsAdvanced({
   settings,
@@ -24,7 +24,9 @@ export default function PixelControlsAdvanced({
   isProcessing,
   onDownload,
   onCopyClipboard,
-}: AdvancedControlsProps) {
+  mobileZoom = 100,
+  onMobileZoomChange,
+}: PixelControlsAdvancedProps) {
   const isMobile = useIsMobile()
   const [expandedSection, setExpandedSection] = useState<string | null>("pixel-size")
   const [mobileSheetOpen, setMobileSheetOpen] = useState<string | null>(null)
@@ -53,27 +55,30 @@ export default function PixelControlsAdvanced({
 
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
   const [localPixelSize, setLocalPixelSize] = useState(settings.pixelSize)
-  
+
   // Sync local state with settings when settings change externally
   useEffect(() => {
     setLocalPixelSize(settings.pixelSize)
   }, [settings.pixelSize])
-  
-  const handlePixelSizeChange = useCallback((value: number) => {
-    const clampedValue = Math.max(1, Math.min(100, value))
-    
-    // Immediate local update for UI responsiveness
-    setLocalPixelSize(clampedValue)
-    
-    // Debounce the actual settings change to prevent excessive re-renders
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current)
-    }
-    
-    debounceTimerRef.current = setTimeout(() => {
-      onSettingsChange({ ...settings, pixelSize: clampedValue })
-    }, 100)
-  }, [settings, onSettingsChange])
+
+  const handlePixelSizeChange = useCallback(
+    (value: number) => {
+      const clampedValue = Math.max(1, Math.min(100, value))
+
+      // Immediate local update for UI responsiveness
+      setLocalPixelSize(clampedValue)
+
+      // Debounce the actual settings change to prevent excessive re-renders
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current)
+      }
+
+      debounceTimerRef.current = setTimeout(() => {
+        onSettingsChange({ ...settings, pixelSize: clampedValue })
+      }, 100)
+    },
+    [settings, onSettingsChange],
+  )
 
   const openMobileSheet = (section: string) => {
     setMobileSheetOpen(section)
@@ -96,7 +101,7 @@ export default function PixelControlsAdvanced({
         className="w-full h-2 bg-border rounded-full cursor-pointer accent-primary disabled:opacity-50"
       />
       <div className="flex gap-1.5 flex-wrap">
-        {PIXEL_SNAP_POINTS.map((point) => (
+        {[2, 4, 8, 16, 32].map((point) => (
           <button
             key={point}
             onClick={(e) => {
@@ -169,7 +174,7 @@ export default function PixelControlsAdvanced({
             className={`px-3 py-2 text-xs rounded-md border font-medium capitalize transition-all ${
               settings.colorEffect === effect
                 ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                : "bg-white border-border text-foreground hover:border-primary/30 hover:bg-secondary"
+                : "bg-white border-border text-foreground hover:border-primary/30"
             } disabled:opacity-50`}
           >
             {effect}
@@ -213,9 +218,7 @@ export default function PixelControlsAdvanced({
               min="2"
               max="8"
               value={settings.posterizeLevels || 4}
-              onChange={(e) =>
-                onSettingsChange({ ...settings, posterizeLevels: Number.parseInt(e.target.value) })
-              }
+              onChange={(e) => onSettingsChange({ ...settings, posterizeLevels: Number.parseInt(e.target.value) })}
               disabled={!hasImage}
               className="w-full h-2 bg-border rounded-full cursor-pointer accent-primary"
             />
@@ -225,9 +228,7 @@ export default function PixelControlsAdvanced({
 
       {settings.colorEffect !== "normal" && (
         <div className="space-y-2.5 pt-1 border-t border-border">
-          <label className="text-xs font-semibold text-foreground block">
-            Palette Size: {settings.paletteSize}
-          </label>
+          <label className="text-xs font-semibold text-foreground block">Palette Size: {settings.paletteSize}</label>
           <input
             type="range"
             min="2"
@@ -281,10 +282,7 @@ export default function PixelControlsAdvanced({
                   onClick={(e) => {
                     e.stopPropagation()
                     setCustomPresets(customPresets.filter((_, i) => i !== idx))
-                    localStorage.setItem(
-                      "pixel-presets",
-                      JSON.stringify(customPresets.filter((_, i) => i !== idx)),
-                    )
+                    localStorage.setItem("pixel-presets", JSON.stringify(customPresets.filter((_, i) => i !== idx)))
                   }}
                   className="px-2 py-2 text-xs bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900 rounded-md border border-red-200 dark:border-red-800 transition-colors"
                   title="Delete preset"
@@ -301,156 +299,179 @@ export default function PixelControlsAdvanced({
 
   // Mobile view: Button triggers for bottom sheets
   if (isMobile) {
+    const MIN_ZOOM = 50
+    const MAX_ZOOM = 400
+
     return (
       <>
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            onClick={() => openMobileSheet("presets")}
-            className="px-3 py-2.5 text-xs font-semibold bg-gradient-to-r from-primary to-primary/90 text-primary-foreground rounded-lg border border-primary/20 hover:shadow-md transition-all active:scale-95"
-          >
-            Load Preset
-          </button>
-          <button
-            onClick={() => openMobileSheet("pixel-size")}
-            className="px-3 py-2.5 text-xs font-semibold bg-card text-foreground rounded-lg border border-border hover:bg-secondary transition-all active:scale-95 flex items-center justify-between"
-          >
-            <span>Pixel Size</span>
-            <span className="text-primary">{localPixelSize}px</span>
-          </button>
-          <button
-            onClick={() => openMobileSheet("sampling")}
-            className="px-3 py-2.5 text-xs font-semibold bg-card text-foreground rounded-lg border border-border hover:bg-secondary transition-all active:scale-95 flex items-center justify-between"
-          >
-            <span>Sampling</span>
-            <span className="text-muted-foreground capitalize text-xs">{settings.sampling}</span>
-          </button>
-          <button
-            onClick={() => openMobileSheet("colors")}
-            className="px-3 py-2.5 text-xs font-semibold bg-card text-foreground rounded-lg border border-border hover:bg-secondary transition-all active:scale-95 flex items-center justify-between"
-          >
-            <span>Color Effects</span>
-            <span className="text-muted-foreground capitalize text-xs">{settings.colorEffect}</span>
-          </button>
-        </div>
-
-        <label className="flex items-center gap-3 p-3 border border-border rounded-lg bg-card hover:bg-secondary transition-colors cursor-pointer">
-          <input
-            type="checkbox"
-            checked={settings.showGrid}
-            onChange={(e) => onSettingsChange({ ...settings, showGrid: e.target.checked })}
-            disabled={!hasImage}
-            className="w-4 h-4 cursor-pointer accent-primary"
-          />
-          <div className="flex flex-col">
-            <span className="text-xs font-semibold text-foreground">Show Pixel Grid</span>
-            <span className="text-xs text-muted-foreground">Visualize pixel boundaries</span>
+        <div className="space-y-2">
+          {/* Zoom Controls - top row for canvas zoom */}
+          <div className="grid grid-cols-3 gap-2">
+            <button
+              onClick={() => onMobileZoomChange?.(Math.max(MIN_ZOOM, mobileZoom - 10))}
+              title="Zoom Out"
+              className="px-3 py-2.5 text-xs font-semibold bg-card text-foreground rounded-lg border border-border hover:bg-secondary transition-all active:scale-95"
+            >
+              −
+            </button>
+            <div className="flex items-center justify-center px-3 py-2.5 text-xs font-semibold bg-secondary text-foreground rounded-lg border border-border">
+              {mobileZoom}%
+            </div>
+            <button
+              onClick={() => onMobileZoomChange?.(Math.min(MAX_ZOOM, mobileZoom + 10))}
+              title="Zoom In"
+              className="px-3 py-2.5 text-xs font-semibold bg-card text-foreground rounded-lg border border-border hover:bg-secondary transition-all active:scale-95"
+            >
+              +
+            </button>
           </div>
-        </label>
 
-        <div className="grid grid-cols-2 gap-2">
+          {/* Presets and Pixel Size in first row */}
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => openMobileSheet("presets")}
+              className="px-3 py-2.5 text-xs font-semibold bg-gradient-to-r from-primary to-primary/90 text-primary-foreground rounded-lg border border-primary/20 hover:shadow-md transition-all active:scale-95"
+            >
+              Presets
+            </button>
+            <button
+              onClick={() => openMobileSheet("pixel-size")}
+              className="px-3 py-2.5 text-xs font-semibold bg-card text-foreground rounded-lg border border-border hover:bg-secondary transition-all active:scale-95 flex items-center justify-between"
+            >
+              <span>Pixel Size</span>
+              <span className="text-primary text-xs">{settings.pixelSize}px</span>
+            </button>
+          </div>
+
+          {/* Sampling and Color Effects in second row */}
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => openMobileSheet("sampling")}
+              className="px-3 py-2.5 text-xs font-semibold bg-card text-foreground rounded-lg border border-border hover:bg-secondary transition-all active:scale-95 flex items-center justify-between"
+            >
+              <span>Sampling</span>
+              <span className="text-muted-foreground capitalize text-xs">{settings.sampling.slice(0, 4)}</span>
+            </button>
+            <button
+              onClick={() => openMobileSheet("colors")}
+              className="px-3 py-2.5 text-xs font-semibold bg-card text-foreground rounded-lg border border-border hover:bg-secondary transition-all active:scale-95 flex items-center justify-between"
+            >
+              <span>Effects</span>
+              <span className="text-muted-foreground capitalize text-xs">{settings.colorEffect.slice(0, 4)}</span>
+            </button>
+          </div>
+
+          {/* Grid checkbox - compact */}
+          <label className="flex items-center gap-2 p-2.5 border border-border rounded-lg bg-card hover:bg-secondary transition-colors cursor-pointer">
+            <input
+              type="checkbox"
+              checked={settings.showGrid}
+              onChange={(e) => onSettingsChange({ ...settings, showGrid: e.target.checked })}
+              disabled={!hasImage}
+              className="w-4 h-4 cursor-pointer accent-primary flex-shrink-0"
+            />
+            <span className="text-xs font-semibold text-foreground">Pixel Grid</span>
+          </label>
+
+          {/* Download and Export in third row */}
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => onDownload(1)}
+              disabled={!hasImage || isProcessing}
+              className={`px-3 py-2.5 text-xs font-semibold rounded-lg border transition-all ${
+                hasImage && !isProcessing
+                  ? "bg-primary text-primary-foreground border-primary hover:shadow-md active:scale-95"
+                  : "bg-muted text-muted-foreground border-border cursor-not-allowed"
+              }`}
+            >
+              {isProcessing ? "..." : "1×"}
+            </button>
+            <button
+              onClick={() => openMobileSheet("export")}
+              className="px-3 py-2.5 text-xs font-semibold bg-white dark:bg-slate-800 text-foreground rounded-lg border border-border hover:bg-secondary transition-all active:scale-95 flex items-center justify-center gap-1.5"
+            >
+              <DownloadIcon className="w-3.5 h-3.5" />
+              More
+            </button>
+          </div>
+
+          {/* Clipboard - full width */}
           <button
-            onClick={() => onDownload(1)}
+            onClick={onCopyClipboard}
             disabled={!hasImage || isProcessing}
-            className={`px-3 py-2.5 text-xs font-semibold rounded-lg border transition-all ${
+            className={`w-full px-3 py-2.5 text-xs font-semibold rounded-lg border transition-all ${
               hasImage && !isProcessing
-                ? "bg-primary text-primary-foreground border-primary hover:shadow-md active:scale-95"
+                ? "bg-emerald-500 dark:bg-emerald-600 text-white border-emerald-600 dark:border-emerald-500 hover:bg-emerald-600 dark:hover:bg-emerald-500 active:scale-95"
                 : "bg-muted text-muted-foreground border-border cursor-not-allowed"
             }`}
           >
-            {isProcessing ? "Processing..." : "Download 1×"}
+            Copy
           </button>
-          <button
-            onClick={() => openMobileSheet("export")}
-            className="px-3 py-2.5 text-xs font-semibold bg-white text-foreground rounded-lg border border-border hover:bg-secondary transition-all active:scale-95 flex items-center justify-center gap-1.5"
-          >
-            <DownloadIcon className="w-3.5 h-3.5" />
-            More Export
-          </button>
+
+          {/* Bottom Sheets */}
+          <BottomSheet isOpen={mobileSheetOpen === "pixel-size"} onClose={closeMobileSheet} title="Pixel Size">
+            {renderPixelSizeContent()}
+          </BottomSheet>
+
+          <BottomSheet isOpen={mobileSheetOpen === "sampling"} onClose={closeMobileSheet} title="Sampling Mode">
+            {renderSamplingContent()}
+          </BottomSheet>
+
+          <BottomSheet isOpen={mobileSheetOpen === "colors"} onClose={closeMobileSheet} title="Color Effects">
+            {renderColorEffectsContent()}
+          </BottomSheet>
+
+          <BottomSheet isOpen={mobileSheetOpen === "presets"} onClose={closeMobileSheet} title="Load Preset">
+            {renderPresetsContent()}
+          </BottomSheet>
+
+          <BottomSheet isOpen={mobileSheetOpen === "export"} onClose={closeMobileSheet} title="Export Options">
+            <div className="space-y-2.5">
+              <button
+                onClick={() => {
+                  onDownload(2)
+                  closeMobileSheet()
+                }}
+                disabled={!hasImage || isProcessing}
+                className={`w-full px-4 py-2 text-xs font-semibold rounded-lg border transition-all ${
+                  hasImage && !isProcessing
+                    ? "bg-secondary text-foreground border-border hover:bg-muted active:scale-95"
+                    : "bg-muted text-muted-foreground border-border cursor-not-allowed"
+                }`}
+              >
+                Download 2×
+              </button>
+              <button
+                onClick={() => {
+                  onDownload(4)
+                  closeMobileSheet()
+                }}
+                disabled={!hasImage || isProcessing}
+                className={`w-full px-4 py-2 text-xs font-semibold rounded-lg border transition-all ${
+                  hasImage && !isProcessing
+                    ? "bg-secondary text-foreground border-border hover:bg-muted active:scale-95"
+                    : "bg-muted text-muted-foreground border-border cursor-not-allowed"
+                }`}
+              >
+                Download 4×
+              </button>
+              <button
+                onClick={() => {
+                  onCopyClipboard()
+                  closeMobileSheet()
+                }}
+                disabled={!hasImage || isProcessing}
+                className={`w-full px-4 py-2 text-xs font-semibold rounded-lg border transition-all ${
+                  hasImage && !isProcessing
+                    ? "bg-emerald-500 dark:bg-emerald-600 text-white border-emerald-600 dark:border-emerald-500 hover:bg-emerald-600 dark:hover:bg-emerald-500 active:scale-95"
+                    : "bg-muted text-muted-foreground border-border cursor-not-allowed"
+                }`}
+              >
+                Copy to Clipboard
+              </button>
+            </div>
+          </BottomSheet>
         </div>
-
-        {/* Bottom Sheets */}
-        <BottomSheet
-          isOpen={mobileSheetOpen === "pixel-size"}
-          onClose={closeMobileSheet}
-          title="Pixel Size"
-        >
-          {renderPixelSizeContent()}
-        </BottomSheet>
-
-        <BottomSheet
-          isOpen={mobileSheetOpen === "sampling"}
-          onClose={closeMobileSheet}
-          title="Sampling Mode"
-        >
-          {renderSamplingContent()}
-        </BottomSheet>
-
-        <BottomSheet
-          isOpen={mobileSheetOpen === "colors"}
-          onClose={closeMobileSheet}
-          title="Color Effects"
-        >
-          {renderColorEffectsContent()}
-        </BottomSheet>
-
-        <BottomSheet
-          isOpen={mobileSheetOpen === "presets"}
-          onClose={closeMobileSheet}
-          title="Load Preset"
-        >
-          {renderPresetsContent()}
-        </BottomSheet>
-
-        <BottomSheet
-          isOpen={mobileSheetOpen === "export"}
-          onClose={closeMobileSheet}
-          title="Export Options"
-        >
-          <div className="space-y-2.5">
-            <button
-              onClick={() => {
-                onDownload(2)
-                closeMobileSheet()
-              }}
-              disabled={!hasImage || isProcessing}
-              className={`w-full px-4 py-2 text-xs font-semibold rounded-lg border transition-all ${
-                hasImage && !isProcessing
-                  ? "bg-secondary text-foreground border-border hover:bg-muted active:scale-95"
-                  : "bg-muted text-muted-foreground border-border cursor-not-allowed"
-              }`}
-            >
-              Download 2×
-            </button>
-            <button
-              onClick={() => {
-                onDownload(4)
-                closeMobileSheet()
-              }}
-              disabled={!hasImage || isProcessing}
-              className={`w-full px-4 py-2 text-xs font-semibold rounded-lg border transition-all ${
-                hasImage && !isProcessing
-                  ? "bg-secondary text-foreground border-border hover:bg-muted active:scale-95"
-                  : "bg-muted text-muted-foreground border-border cursor-not-allowed"
-              }`}
-            >
-              Download 4×
-            </button>
-            <button
-              onClick={() => {
-                onCopyClipboard()
-                closeMobileSheet()
-              }}
-              disabled={!hasImage || isProcessing}
-              className={`w-full px-4 py-2 text-xs font-semibold rounded-lg border transition-all ${
-                hasImage && !isProcessing
-                  ? "bg-emerald-500 dark:bg-emerald-600 text-white border-emerald-600 dark:border-emerald-500 hover:bg-emerald-600 dark:hover:bg-emerald-500 active:scale-95"
-                  : "bg-muted text-muted-foreground border-border cursor-not-allowed"
-              }`}
-            >
-              Copy to Clipboard
-            </button>
-          </div>
-        </BottomSheet>
       </>
     )
   }
@@ -481,7 +502,7 @@ export default function PixelControlsAdvanced({
           onClick={() => setExpandedSection(expandedSection === "pixel-size" ? null : "pixel-size")}
         >
           <label className="text-xs font-semibold text-foreground">Pixel Size</label>
-          <span className="text-xs font-semibold text-primary">{localPixelSize}px</span>
+          <span className="text-xs font-semibold text-primary">{settings.pixelSize}px</span>
         </div>
         {expandedSection === "pixel-size" && (
           <div
