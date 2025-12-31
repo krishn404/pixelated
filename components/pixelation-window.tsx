@@ -12,6 +12,7 @@ import PresetPanel from "./preset-panel"
 import type { PixelSettings } from "@/lib/pixel-engine"
 import { pixelateImage } from "@/lib/pixel-engine"
 import { useIsMobile } from "@/components/ui/use-mobile"
+import { ThemeToggle } from "./theme-toggle"
 
 interface PixelationWindowProps {
   imageData: {
@@ -111,7 +112,7 @@ export default function PixelationWindow({ imageData, onImageUpload, fileInputRe
 
   return (
     <>
-      <div className={`w-full h-full bg-white border border-border rounded-lg shadow-xl overflow-hidden flex flex-col ${
+      <div className={`w-full h-full bg-card border border-border rounded-lg shadow-xl overflow-hidden flex flex-col ${
         isMobile ? "" : ""
       }`}>
         {/* Title Bar */}
@@ -119,17 +120,20 @@ export default function PixelationWindow({ imageData, onImageUpload, fileInputRe
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.3 }}
-          className="bg-gradient-to-r from-slate-50 via-slate-100 to-slate-50 border-b border-border px-4 md:px-5 py-3 md:py-3.5 flex items-center gap-3.5 flex-shrink-0"
+          className="bg-gradient-to-r from-slate-50 via-slate-100 to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 border-b border-border px-4 md:px-5 py-3 md:py-3.5 flex items-center justify-between gap-3.5 flex-shrink-0"
         >
-          <motion.div
-            animate={{ rotate: [0, 5, -5, 0] }}
-            transition={{ duration: 3, repeat: Number.POSITIVE_INFINITY }}
-            className="w-5 h-5 bg-gradient-to-br from-primary to-primary/80 rounded-md shadow-sm"
-          />
-          <div className="flex flex-col">
-            <span className="text-sm font-semibold text-foreground">Pixelator</span>
-            <span className="text-xs text-muted-foreground">Image Pixel Art Studio</span>
+          <div className="flex items-center gap-3.5">
+            <motion.div
+              animate={{ rotate: [0, 5, -5, 0] }}
+              transition={{ duration: 3, repeat: Number.POSITIVE_INFINITY }}
+              className="w-5 h-5 bg-gradient-to-br from-primary to-primary/80 rounded-md shadow-sm"
+            />
+            <div className="flex flex-col">
+              <span className="text-sm font-semibold text-foreground">Pixelator</span>
+              <span className="text-xs text-muted-foreground">Image Pixel Art Studio</span>
+            </div>
           </div>
+          <ThemeToggle />
         </motion.div>
 
         {/* Main Content Area */}
@@ -197,7 +201,7 @@ export default function PixelationWindow({ imageData, onImageUpload, fileInputRe
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3, delay: 0.2 }}
-                className="flex-1 border border-border rounded-lg bg-gradient-to-br from-slate-50 to-white overflow-hidden shadow-inner min-h-0"
+                className="flex-1 border border-border rounded-lg bg-gradient-to-br from-slate-50 to-white dark:from-slate-900 dark:to-slate-800 overflow-hidden shadow-inner min-h-0"
               >
                 <InteractivePreview
                   imageData={imageData}
@@ -253,7 +257,7 @@ export default function PixelationWindow({ imageData, onImageUpload, fileInputRe
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.2 }}
-                className="flex-1 overflow-y-auto bg-white border border-border rounded-lg p-4 space-y-3"
+                className="flex-1 overflow-y-auto bg-card border border-border rounded-lg p-4 space-y-3"
               >
                 {activeTab === "controls" ? (
                   <PixelControlsAdvanced

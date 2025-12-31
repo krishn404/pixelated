@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 
 import { Fjalla_One, Inconsolata } from "next/font/google"
+import { ThemeProvider } from "@/components/theme-provider"
 
 const fjallaOne = Fjalla_One({
   subsets: ["latin"],
@@ -57,9 +58,16 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`font-mono antialiased ${fjallaOne.className} ${inconsolata.className}`}>
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem={false}
+          disableTransitionOnChange={false}
+        >
+          {children}
+        </ThemeProvider>
         <Analytics />
       </body>
     </html>

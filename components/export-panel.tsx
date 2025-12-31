@@ -269,7 +269,7 @@ export default function ExportPanel({ imageData, settings, hasImage, isProcessin
       )}
 
       {/* Format Info */}
-      <motion.div
+      {/* <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
@@ -282,7 +282,7 @@ export default function ExportPanel({ imageData, settings, hasImage, isProcessin
           <div>Watermark: pix.krixnx.xyz included</div>
           <div>Colors: Matched to preview</div>
         </div>
-      </motion.div>
+      </motion.div> */}
     </div>
   )
 }

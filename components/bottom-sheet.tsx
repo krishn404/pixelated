@@ -52,12 +52,12 @@ export default function BottomSheet({
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
             style={{ maxHeight }}
-            className="fixed bottom-0 left-0 right-0 bg-white rounded-t-lg shadow-2xl z-[60] flex flex-col"
+            className="fixed bottom-0 left-0 right-0 bg-card rounded-t-lg shadow-2xl z-[60] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Handle bar */}
             <div className="flex-shrink-0 pt-2 pb-1 flex justify-center">
-              <div className="w-12 h-1 bg-neutral-300 rounded-full" />
+              <div className="w-12 h-1 bg-muted rounded-full" />
             </div>
 
             {/* Header */}

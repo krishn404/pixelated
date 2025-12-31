@@ -101,7 +101,7 @@ export default function Home() {
 
   return (
     <main 
-      className="h-screen w-screen overflow-hidden bg-gradient-to-br from-neutral-100 via-neutral-50 to-blue-50 flex items-center justify-center p-2 md:p-4"
+      className="h-screen w-screen overflow-hidden bg-gradient-to-br from-neutral-100 via-neutral-50 to-blue-50 dark:from-neutral-900 dark:via-neutral-800 dark:to-slate-900 flex items-center justify-center p-2 md:p-4"
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >

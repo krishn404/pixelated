@@ -72,16 +72,16 @@ export default function PresetPanel({ imageData, onPresetApply, currentSettings 
           <div className="flex-1 bg-black/30" onClick={() => setIsOpen(false)} />
 
           {/* Panel */}
-          <div className="w-96 bg-white shadow-2xl flex flex-col overflow-hidden">
+          <div className="w-96 bg-card shadow-2xl flex flex-col overflow-hidden">
             {/* Header */}
-            <div className="p-4 border-b border-neutral-200 flex items-center justify-between bg-gradient-to-r from-blue-50 to-blue-25">
+            <div className="p-4 border-b border-border flex items-center justify-between bg-gradient-to-r from-blue-50 to-blue-25 dark:from-blue-950 dark:to-blue-900">
               <div className="space-y-0.5">
-                <h2 className="text-sm font-semibold text-neutral-900">Presets</h2>
-                <p className="text-xs text-neutral-600">Quick creative effects for your images</p>
+                <h2 className="text-sm font-semibold text-foreground">Presets</h2>
+                <p className="text-xs text-muted-foreground">Quick creative effects for your images</p>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="w-7 h-7 flex items-center justify-center text-neutral-600 hover:bg-neutral-200 rounded-md transition-colors text-lg font-semibold"
+                className="w-7 h-7 flex items-center justify-center text-muted-foreground hover:bg-secondary rounded-md transition-colors text-lg font-semibold"
               >
                 ×
               </button>
